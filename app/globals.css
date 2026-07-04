@@ -1,26 +1,336 @@
 @import "tailwindcss";
 
+/* ===== Ariel AI — ערכת עיצוב =====
+   רקע בהיר-שמימי, כרטיסים לבנים עם צל רך, פינות מעוגלות מאוד,
+   Accent-ים של כחול/סגול/ורוד/אלמוגי, אווירת סטיקרים חמודה. */
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #f8faff;
+  --foreground: #111827;
+  --muted: #6b7280;
+  --blue: #4f7bff;
+  --purple: #7c5cff;
+  --pink: #ff7ac8;
+  --coral: #e77455;
+  --card: #ffffff;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+  --color-ink: var(--foreground);
+  --color-muted: var(--muted);
+  --color-blue: var(--blue);
+  --color-purple: var(--purple);
+  --color-pink: var(--pink);
+  --color-coral: var(--coral);
+  --color-card: var(--card);
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+  --font-sans: var(--font-heebo), "Heebo", "Assistant", system-ui, sans-serif;
+
+  --shadow-soft: 0 20px 60px rgba(15, 23, 42, 0.1);
+  --shadow-softer: 0 10px 30px rgba(15, 23, 42, 0.08);
+  --shadow-sticker: 0 14px 35px rgba(15, 23, 42, 0.14);
+
+  --radius-blob: 2.5rem;
+
+  --animate-float: float 5s ease-in-out infinite;
+  --animate-float-slow: float 6.5s ease-in-out infinite;
+
+  @keyframes float {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-10px);
+    }
   }
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-heebo), "Heebo", "Assistant", system-ui, sans-serif;
+  overflow-x: hidden;
+}
+
+/* כרטיס לבן בסגנון סטיקר: צל רך + הדגשת פנים עדינה למעלה */
+.card-soft {
+  background: var(--card);
+  border-radius: 2rem;
+  box-shadow:
+    0 20px 60px rgba(15, 23, 42, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.7);
+}
+
+/* צל "מדבקה" לאסטים שקופים */
+.sticker-shadow {
+  filter: drop-shadow(0 12px 24px rgba(15, 23, 42, 0.16));
+}
+
+.sticker-shadow-sm {
+  filter: drop-shadow(0 6px 14px rgba(15, 23, 42, 0.14));
+}
+
+/* טקסט גרדיאנט כחול→סגול לכותרות מודגשות */
+.text-gradient {
+  background: linear-gradient(120deg, var(--blue), var(--purple));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* כפתור ראשי: גרדיאנט כחול→סגול, גלולה, צל עדין */
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border-radius: 999px;
+  padding: 0.9rem 2rem;
+  font-weight: 700;
+  color: #fff;
+  background: linear-gradient(120deg, var(--blue), var(--purple));
+  box-shadow: 0 10px 30px rgba(79, 123, 255, 0.35);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.btn-primary:hover {
+  transform: scale(1.03);
+  box-shadow: 0 14px 38px rgba(79, 123, 255, 0.45);
+}
+
+.btn-primary:focus-visible {
+  outline: 3px solid var(--blue);
+  outline-offset: 3px;
+}
+
+/* כפתור משני: לבן עם מסגרת כחולה בהירה */
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border-radius: 999px;
+  padding: 0.9rem 2rem;
+  font-weight: 700;
+  color: var(--foreground);
+  background: #fff;
+  border: 2px solid rgba(79, 123, 255, 0.35);
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.btn-secondary:hover {
+  background: rgba(79, 123, 255, 0.06);
+  transform: scale(1.02);
+}
+
+.btn-secondary:focus-visible {
+  outline: 3px solid var(--blue);
+  outline-offset: 3px;
+}
+
+/* רקע נקודות עדין לסקשנים */
+.bg-dots {
+  background-image: radial-gradient(rgba(79, 123, 255, 0.12) 1.5px, transparent 1.5px);
+  background-size: 26px 26px;
+}
+
+/* ===== ממשק הניהול ===== */
+
+/* כרטיס אדמין: לבן, מסגרת תכלכלה, פינות מעוגלות מאוד וצל רך */
+.admin-card {
+  background: #ffffff;
+  border: 1px solid #eef2ff;
+  border-radius: 28px;
+  box-shadow: 0 18px 50px rgba(15, 23, 42, 0.08);
+}
+
+/* כפתור אדמין ראשי — גרדיאנט כחול→סגול, גלולה */
+.btn-admin-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border-radius: 999px;
+  padding: 0.65rem 1.5rem;
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: #fff;
+  background: linear-gradient(120deg, var(--blue), var(--purple));
+  box-shadow: 0 8px 22px rgba(79, 123, 255, 0.3);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+  cursor: pointer;
+}
+
+.btn-admin-primary:hover:not(:disabled) {
+  transform: scale(1.02);
+  box-shadow: 0 10px 28px rgba(79, 123, 255, 0.4);
+}
+
+.btn-admin-primary:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+/* כפתור אדמין משני — לבן עם מסגרת כחולה בהירה */
+.btn-admin-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border-radius: 999px;
+  padding: 0.65rem 1.5rem;
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: var(--foreground);
+  background: #fff;
+  border: 2px solid rgba(79, 123, 255, 0.3);
+  transition: background 0.2s ease, transform 0.2s ease, opacity 0.2s ease;
+  cursor: pointer;
+}
+
+.btn-admin-secondary:hover:not(:disabled) {
+  background: rgba(79, 123, 255, 0.06);
+  transform: scale(1.01);
+}
+
+.btn-admin-secondary:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+/* כפתור מסוכן — אדום עדין, לא צעקני */
+.btn-admin-danger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border-radius: 999px;
+  padding: 0.65rem 1.5rem;
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: #b91c1c;
+  background: #fef2f2;
+  border: 2px solid #fecaca;
+  transition: background 0.2s ease, opacity 0.2s ease;
+  cursor: pointer;
+}
+
+.btn-admin-danger:hover:not(:disabled) {
+  background: #fee2e2;
+}
+
+.btn-admin-danger:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+/* שדה קלט אדמין */
+.admin-input {
+  width: 100%;
+  border-radius: 1rem;
+  border: 2px solid #eef2ff;
+  background: #fff;
+  padding: 0.65rem 1rem;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.admin-input:focus {
+  border-color: var(--blue);
+}
+
+.admin-input[aria-invalid="true"] {
+  border-color: #fca5a5;
+}
+
+/* הסתרה ויזואלית נגישה (ל-H1 טקסטואלי מאחורי כותרת גרפית) */
+.sr-only-visual {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ===== נגני המדיה המותאמים (וידאו/אודיו) — פסי גרירה ===== */
+/* המילוי (גרדיאנט כחול→סגול) מגיע כ-inline style לפי ההתקדמות;
+   כאן רק הצורה: פס דק מעוגל וידית לבנה עגולה עם צל רך. */
+
+.media-range {
+  -webkit-appearance: none;
+  appearance: none;
+  border-radius: 999px;
+  outline: none;
+}
+
+.media-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 999px;
+  background: #fff;
+  border: none;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.35);
+  transition: transform 0.15s ease;
+}
+
+.media-range::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  border-radius: 999px;
+  background: #fff;
+  border: none;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.35);
+  transition: transform 0.15s ease;
+}
+
+.media-range::-moz-range-track {
+  background: transparent;
+}
+
+.media-range:hover::-webkit-slider-thumb,
+.media-range:focus-visible::-webkit-slider-thumb {
+  transform: scale(1.25);
+}
+
+.media-range:hover::-moz-range-thumb,
+.media-range:focus-visible::-moz-range-thumb {
+  transform: scale(1.25);
+}
+
+.media-range:focus-visible {
+  box-shadow: 0 0 0 3px rgba(79, 123, 255, 0.4);
+}
+
+/* ===== סמן עכבר מותאם אישית — בכל רחבי האתר ===== */
+/* החץ הסגול עם המסקוט (cursor-32/64.png). נקודת הקליק: קצה החץ (1,0).
+   שדות טקסט נשארים עם סמן טקסט (I-beam) כדי שיהיה נוח לערוך. */
+
+html,
+body,
+a,
+button,
+[role="button"],
+select,
+summary,
+label,
+input[type="checkbox"],
+input[type="radio"],
+input[type="range"],
+input[type="file"],
+input[type="submit"],
+input[type="color"] {
+  cursor: url("/cursor-32.png") 1 0, auto !important;
+  cursor: -webkit-image-set(url("/cursor-32.png") 1x, url("/cursor-64.png") 2x) 1 0,
+    auto !important;
+  cursor: image-set(url("/cursor-32.png") 1x, url("/cursor-64.png") 2x) 1 0,
+    auto !important;
 }
