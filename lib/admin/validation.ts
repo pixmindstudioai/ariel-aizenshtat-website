@@ -94,6 +94,8 @@ export const guideSchema = z.object({
   content: z.string().optional().default(""),
   category_id: z.string().uuid("קטגוריה לא תקינה").nullable().optional(),
   cover_image: urlOrPath.optional().default(""),
+  audio_url: selfHostedMediaUrl.optional().default(""),
+  show_toc: z.boolean().optional().default(false),
   read_time: z.coerce.number().int().min(1, "זמן קריאה — לפחות דקה").max(240),
   level: levelSchema,
   tags: tagList,

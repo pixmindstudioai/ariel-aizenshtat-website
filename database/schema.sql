@@ -281,6 +281,8 @@ create table if not exists public.guides (
   content text not null default '',
   category_id uuid references public.categories (id) on delete set null,
   cover_image text,
+  audio_url text,
+  show_toc boolean not null default false,
   read_time int not null default 5,
   level text not null default 'מתחילים' check (level in ('מתחילים', 'בינוני', 'מתקדמים')),
   tags text[] not null default '{}',

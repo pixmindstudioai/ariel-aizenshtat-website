@@ -4,12 +4,15 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import AssetImage from "@/components/AssetImage";
 import CTASection from "@/components/CTASection";
+import GuideToc from "@/components/GuideToc";
 import Reveal from "@/components/Reveal";
 import SimpleContent from "@/components/SimpleContent";
+import AudioPlayer from "@/components/media/AudioPlayer";
 import { icons } from "@/data/assets";
 import { getCurrentProfile } from "@/lib/auth";
 import { fetchGuideRow } from "@/lib/cms";
 import { formatDate } from "@/lib/format";
+import { extractHeadings } from "@/lib/toc";
 
 export const revalidate = 300;
 
@@ -41,6 +44,8 @@ export default async function GuidePage({ params, searchParams }: GuidePageProps
   const isPreview = preview === "true" && !!(await getCurrentProfile());
   const guide = await fetchGuideRow(slug, isPreview);
   if (!guide || (!isPreview && guide.status !== "published")) notFound();
+
+  const tocHeadings = guide.show_toc ? extractHeadings(guide.content) : [];
 
   return (
     <div className="flex flex-col gap-16 pb-8 md:gap-24">
@@ -92,6 +97,31 @@ export default async function GuidePage({ params, searchParams }: GuidePageProps
               alt={guide.title}
               className="w-full rounded-[2rem] shadow-[0_20px_60px_rgba(15,23,42,0.15)]"
             />
+          </Reveal>
+        )}
+
+        {guide.audio_url && (
+          <Reveal className="mt-10">
+            <section aria-label="סקירה קולית" className="flex flex-col gap-3">
+              <p className="flex items-center gap-2 font-black">
+                <span className="inline-block w-6 shrink-0" aria-hidden>
+                  <AssetImage
+                    asset={icons.videoPlay}
+                    decorative
+                    variant="flat"
+                    className="w-full h-auto"
+                  />
+                </span>
+                סקירה קולית — מעדיפים להאזין?
+              </p>
+              <AudioPlayer src={guide.audio_url} title={guide.title} />
+            </section>
+          </Reveal>
+        )}
+
+        {tocHeadings.length >= 2 && (
+          <Reveal className="mt-10">
+            <GuideToc headings={tocHeadings} />
           </Reveal>
         )}
 

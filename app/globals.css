@@ -48,6 +48,11 @@
   }
 }
 
+/* גלילה חלקה לעוגנים — למשל קפיצה מתוכן העניינים לכותרת במדריך */
+html {
+  scroll-behavior: smooth;
+}
+
 body {
   background: var(--background);
   color: var(--foreground);

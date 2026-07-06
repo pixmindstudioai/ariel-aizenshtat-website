@@ -15,6 +15,8 @@ function toDbRow(data: ReturnType<typeof guideSchema.parse>) {
     content: data.content,
     category_id: data.category_id ?? null,
     cover_image: orNull(data.cover_image),
+    audio_url: orNull(data.audio_url),
+    show_toc: data.show_toc,
     read_time: data.read_time,
     level: data.level,
     tags: data.tags,
@@ -27,6 +29,23 @@ function toDbRow(data: ReturnType<typeof guideSchema.parse>) {
   };
 }
 
+/** עמודות שנוספו במיגרציה database/guide-audio-toc.sql — ייתכן שעוד לא קיימות ב-DB */
+const MIGRATED_COLUMNS = ["audio_url", "show_toc"] as const;
+
+const MIGRATION_HINT =
+  " (שימו לב: סקירה קולית ותוכן עניינים לא נשמרו — יש להריץ את database/guide-audio-toc.sql ב-SQL Editor של Supabase)";
+
+function isMissingMigratedColumn(error: { message?: string }): boolean {
+  const message = error.message ?? "";
+  return MIGRATED_COLUMNS.some((column) => message.includes(`'${column}'`));
+}
+
+function withoutMigratedColumns(row: ReturnType<typeof toDbRow>) {
+  const copy: Record<string, unknown> = { ...row };
+  for (const column of MIGRATED_COLUMNS) delete copy[column];
+  return copy;
+}
+
 export async function createGuide(input: GuideInput): Promise<ActionResult<{ id: string }>> {
   const auth = await assertRole(["admin", "editor"]);
   if ("error" in auth) return { ok: false, error: auth.error };
@@ -35,12 +54,20 @@ export async function createGuide(input: GuideInput): Promise<ActionResult<{ id:
   if (!parsed.success) return { ok: false, error: firstZodError(parsed.error) };
 
   const supabase = await createServerClient();
-  const { data, error } = await supabase
-    .from("guides")
-    .insert(toDbRow(parsed.data))
-    .select("id, slug")
-    .single();
-  if (error) return { ok: false, error: friendlyDbError(error) };
+  const row = toDbRow(parsed.data);
+  let { data, error } = await supabase.from("guides").insert(row).select("id, slug").single();
+
+  // ה-DB עוד בלי המיגרציה — שומרים בלי העמודות החדשות כדי לא לחסום את העבודה
+  let migrationMissing = false;
+  if (error && isMissingMigratedColumn(error)) {
+    migrationMissing = true;
+    ({ data, error } = await supabase
+      .from("guides")
+      .insert(withoutMigratedColumns(row))
+      .select("id, slug")
+      .single());
+  }
+  if (error || !data) return { ok: false, error: friendlyDbError(error ?? {}) };
 
   await logActivity(
     supabase,
@@ -51,7 +78,11 @@ export async function createGuide(input: GuideInput): Promise<ActionResult<{ id:
     `נוצר מדריך: ${parsed.data.title}`
   );
   revalidateGuides(data.slug);
-  return { ok: true, data: { id: data.id }, message: "המדריך נוצר בהצלחה" };
+  return {
+    ok: true,
+    data: { id: data.id },
+    message: `המדריך נוצר בהצלחה${migrationMissing ? MIGRATION_HINT : ""}`,
+  };
 }
 
 export async function updateGuide(id: string, input: GuideInput): Promise<ActionResult> {
@@ -62,7 +93,15 @@ export async function updateGuide(id: string, input: GuideInput): Promise<Action
   if (!parsed.success) return { ok: false, error: firstZodError(parsed.error) };
 
   const supabase = await createServerClient();
-  const { error } = await supabase.from("guides").update(toDbRow(parsed.data)).eq("id", id);
+  const row = toDbRow(parsed.data);
+  let { error } = await supabase.from("guides").update(row).eq("id", id);
+
+  // ה-DB עוד בלי המיגרציה — שומרים בלי העמודות החדשות כדי לא לחסום את העבודה
+  let migrationMissing = false;
+  if (error && isMissingMigratedColumn(error)) {
+    migrationMissing = true;
+    ({ error } = await supabase.from("guides").update(withoutMigratedColumns(row)).eq("id", id));
+  }
   if (error) return { ok: false, error: friendlyDbError(error) };
 
   await logActivity(
@@ -74,7 +113,10 @@ export async function updateGuide(id: string, input: GuideInput): Promise<Action
     `עודכן מדריך: ${parsed.data.title}`
   );
   revalidateGuides(parsed.data.slug);
-  return { ok: true, message: "השינויים נשמרו והאתר עודכן" };
+  return {
+    ok: true,
+    message: `השינויים נשמרו והאתר עודכן${migrationMissing ? MIGRATION_HINT : ""}`,
+  };
 }
 
 export async function publishGuide(id: string, publish: boolean): Promise<ActionResult> {

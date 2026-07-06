@@ -9,6 +9,7 @@
 import VideoEmbed from "@/components/VideoEmbed";
 import AudioPlayer from "@/components/media/AudioPlayer";
 import ContentImage from "@/components/media/ContentImage";
+import { injectHeadingIds, lightHeadingId, splitBlocks } from "@/lib/toc";
 
 const IMAGE_RE = /^!\[([^\]]*)\]\(([^)]+)\)$/;
 const VIDEO_RE = /^@video\(([^)]+)\)$/;
@@ -54,8 +55,8 @@ function sanitizeHtml(html: string): string {
 /** עיצוב תוכן HTML מהעורך העשיר (Tiptap) בשפת האתר */
 const richHtmlClasses = [
   "flex flex-col leading-relaxed",
-  "[&_h2]:mt-4 [&_h2]:mb-2 [&_h2]:text-2xl [&_h2]:font-black",
-  "[&_h3]:mt-2 [&_h3]:mb-1.5 [&_h3]:text-xl [&_h3]:font-extrabold",
+  "[&_h2]:mt-4 [&_h2]:mb-2 [&_h2]:text-2xl [&_h2]:font-black [&_h2]:scroll-mt-28",
+  "[&_h3]:mt-2 [&_h3]:mb-1.5 [&_h3]:text-xl [&_h3]:font-extrabold [&_h3]:scroll-mt-28",
   "[&_p]:mb-4 [&_p]:text-lg [&_p]:text-ink/90",
   "[&_ul]:mb-4 [&_ul]:list-disc [&_ul]:pr-6 [&_ol]:mb-4 [&_ol]:list-decimal [&_ol]:pr-6",
   "[&_li]:mb-1.5 [&_li]:text-lg [&_li]:text-ink/90 [&_li::marker]:text-blue",
@@ -77,31 +78,36 @@ export default function SimpleContent({ content, className = "" }: SimpleContent
       <div
         dir="rtl"
         className={`${richHtmlClasses} ${className}`}
-        dangerouslySetInnerHTML={{ __html: sanitizeHtml(content) }}
+        dangerouslySetInnerHTML={{ __html: injectHeadingIds(sanitizeHtml(content)) }}
       />
     );
   }
 
-  const blocks = content
-    .split(/\n\s*\n/)
-    .map((b) => b.trim())
-    .filter(Boolean);
+  const blocks = splitBlocks(content);
 
   if (blocks.length === 0) return null;
+
+  // עוגני תוכן עניינים — אותה ספירה סידורית כמו extractHeadings ב-lib/toc
+  const headingNumbers = new Map<number, number>();
+  blocks.forEach((block, i) => {
+    if (block.startsWith("## ") || block.startsWith("### ")) {
+      headingNumbers.set(i, headingNumbers.size + 1);
+    }
+  });
 
   return (
     <div className={`flex flex-col gap-5 leading-relaxed ${className}`}>
       {blocks.map((block, i) => {
         if (block.startsWith("### ")) {
           return (
-            <h3 key={i} className="mt-2 text-xl font-extrabold">
+            <h3 key={i} id={lightHeadingId(headingNumbers.get(i) ?? 0)} className="mt-2 scroll-mt-28 text-xl font-extrabold">
               {block.slice(4)}
             </h3>
           );
         }
         if (block.startsWith("## ")) {
           return (
-            <h2 key={i} className="mt-4 text-2xl font-black">
+            <h2 key={i} id={lightHeadingId(headingNumbers.get(i) ?? 0)} className="mt-4 scroll-mt-28 text-2xl font-black">
               {block.slice(3)}
             </h2>
           );

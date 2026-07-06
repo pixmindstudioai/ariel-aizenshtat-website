@@ -118,6 +118,8 @@ export interface GuideRow {
   content: string;
   category_id: string | null;
   cover_image: string | null;
+  audio_url: string | null;
+  show_toc: boolean;
   read_time: number;
   level: ContentLevel;
   tags: string[];

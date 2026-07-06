@@ -186,6 +186,8 @@ export async function fetchGuideRow(slug: string, preview = false): Promise<Guid
     content: "",
     category_id: null,
     cover_image: null,
+    audio_url: null,
+    show_toc: false,
     read_time: local.readingTime,
     level: local.level,
     tags: [local.tag],

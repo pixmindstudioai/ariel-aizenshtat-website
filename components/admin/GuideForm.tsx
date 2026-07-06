@@ -9,6 +9,7 @@ import { createGuide, updateGuide } from "@/lib/admin/actions/guides";
 import type { CategoryRow, GuideRow } from "@/lib/types";
 import { icons } from "@/data/assets";
 import AssetImage from "@/components/AssetImage";
+import AdminAudioPicker from "@/components/admin/AdminAudioPicker";
 import AdminCard from "@/components/admin/AdminCard";
 import AdminFormField from "@/components/admin/AdminFormField";
 import AdminImagePicker from "@/components/admin/AdminImagePicker";
@@ -30,6 +31,8 @@ function toDefaults(guide?: GuideRow): GuideInput {
     content: guide?.content ?? "",
     category_id: guide?.category_id ?? null,
     cover_image: guide?.cover_image ?? "",
+    audio_url: guide?.audio_url ?? "",
+    show_toc: guide?.show_toc ?? false,
     read_time: guide?.read_time ?? 5,
     level: guide?.level ?? "מתחילים",
     tags: guide?.tags?.join(", ") ?? "",
@@ -64,6 +67,7 @@ export default function GuideForm({ categories, guide }: GuideFormProps) {
   const title = watch("title") ?? "";
   const slug = watch("slug") ?? "";
   const coverImage = watch("cover_image") ?? "";
+  const audioUrl = watch("audio_url") ?? "";
   const content = watch("content") ?? "";
   const seoTitle = watch("seo_title") ?? "";
   const seoDescription = watch("seo_description") ?? "";
@@ -146,11 +150,32 @@ export default function GuideForm({ categories, guide }: GuideFormProps) {
         </AdminCard>
 
         <AdminCard title="תוכן המדריך" icon={icons.notes}>
-          <AdminRichTextEditor
-            label="תוכן מלא"
-            value={content}
-            onChange={(v) => setValue("content", v)}
-            rows={16}
+          <div className="flex flex-col gap-4">
+            <AdminRichTextEditor
+              label="תוכן מלא"
+              value={content}
+              onChange={(v) => setValue("content", v)}
+              rows={16}
+            />
+            <label className="flex items-center gap-3 rounded-2xl bg-slate-50 px-4 py-3 font-bold">
+              <input type="checkbox" className="h-5 w-5 accent-[#4f7bff]" {...register("show_toc")} />
+              <span>
+                תוכן עניינים אוטומטי
+                <span className="block text-xs font-semibold text-muted">
+                  נבנה מהכותרות במדריך (## ו-###) ומוצג לקוראים לפני התוכן
+                </span>
+              </span>
+            </label>
+          </div>
+        </AdminCard>
+
+        <AdminCard title="סקירה קולית" icon={icons.videoPlay}>
+          <AdminAudioPicker
+            label="הקלטת סקירה של המדריך"
+            value={audioUrl}
+            onChange={(url) => setValue("audio_url", url, { shouldValidate: true })}
+            error={errors.audio_url?.message}
+            hint="הקוראים יוכלו להאזין לסקירה בראש המדריך — מעלים קובץ אודיו לספריית המדיה ובוחרים אותו"
           />
         </AdminCard>
 
