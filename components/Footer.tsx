@@ -26,7 +26,7 @@ export default function Footer({ settings }: FooterProps) {
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="card-soft relative overflow-hidden px-8 py-12 md:px-14">
           {/* קישוט פינתי עדין */}
-          <div className="pointer-events-none absolute -left-6 -bottom-8 w-28 opacity-70 rotate-12">
+          <div className="pointer-events-none absolute -bottom-8 left-2 w-28 opacity-70 rotate-12 md:-left-6">
             <AssetImage asset={decorations.sparklesSet} decorative variant="flat" className="w-full h-auto" />
           </div>
 

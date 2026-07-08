@@ -58,7 +58,7 @@ export default async function GuidePage({ params, searchParams }: GuidePageProps
         </div>
       )}
 
-      <article className="mx-auto w-full max-w-3xl px-4 pt-10 sm:px-6 lg:px-8">
+      <article className="overflow-guard mx-auto w-full max-w-3xl px-4 pt-10 sm:px-6 lg:px-8">
         <nav aria-label="פירורי לחם" className="mb-6 text-sm font-semibold text-muted">
           <Link href="/guides" className="hover:text-blue">
             מדריכים כתובים

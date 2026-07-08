@@ -67,9 +67,9 @@ export default function HeroSection({ heroTitle, heroDescription }: HeroSectionP
   return (
     <section className="relative overflow-hidden">
       {/* רקע: כתמי גרדיאנט רכים */}
-      <AnimatedBlob className="-top-24 right-[10%]" />
+      <AnimatedBlob className="-top-24 right-[10%] hidden sm:block" />
       <AnimatedBlob
-        className="top-40 -left-40"
+        className="top-40 -left-40 hidden sm:block"
         from="rgba(255,122,200,0.13)"
         to="rgba(124,92,255,0.10)"
         size={520}

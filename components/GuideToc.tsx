@@ -11,7 +11,7 @@ export default function GuideToc({ headings }: GuideTocProps) {
   if (headings.length < 2) return null;
 
   return (
-    <nav aria-label="תוכן עניינים" className="card-soft p-6 md:p-8">
+    <nav aria-label="תוכן עניינים" className="card-soft overflow-guard p-6 md:p-8">
       <p className="mb-4 flex items-center gap-2 text-lg font-black">
         <span className="inline-block w-6 shrink-0" aria-hidden>
           <AssetImage asset={icons.notes} decorative variant="flat" className="w-full h-auto" />
@@ -23,7 +23,7 @@ export default function GuideToc({ headings }: GuideTocProps) {
           <li key={heading.id} className={heading.level === 3 ? "pr-5" : ""}>
             <a
               href={`#${heading.id}`}
-              className={`inline-flex items-start gap-2 font-bold underline-offset-4 transition-colors hover:text-blue hover:underline ${
+              className={`inline-flex min-w-0 items-start gap-2 break-words font-bold underline-offset-4 transition-colors hover:text-blue hover:underline ${
                 heading.level === 3 ? "text-sm text-muted" : "text-ink"
               }`}
             >

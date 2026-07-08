@@ -16,9 +16,9 @@ export default function CTASection({
   subtitle = "ספרו לי מה אתם צריכים — אתר, סרטון, אוטומציה או הכל ביחד — ותקבלו תשובה עוד היום.",
 }: CTASectionProps) {
   return (
-    <section className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+    <section className="overflow-guard relative mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
       <Reveal>
-        <div className="card-soft relative overflow-hidden px-6 py-14 text-center md:px-16 md:py-20">
+        <div className="card-soft overflow-guard relative px-6 py-14 text-center md:px-16 md:py-20">
           {/* רקע עדין */}
           <div
             aria-hidden

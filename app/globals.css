@@ -51,13 +51,82 @@
 /* גלילה חלקה לעוגנים — למשל קפיצה מתוכן העניינים לכותרת במדריך */
 html {
   scroll-behavior: smooth;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+  overflow-x: clip;
+  overscroll-behavior-x: none;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-heebo), "Heebo", "Assistant", system-ui, sans-serif;
+  min-width: 0;
+  width: 100%;
+  max-width: 100%;
   overflow-x: hidden;
+  overflow-x: clip;
+  overscroll-behavior-x: none;
+}
+
+body > * {
+  min-width: 0;
+}
+
+main {
+  width: 100%;
+  min-width: 0;
+  overflow-x: hidden;
+  overflow-x: clip;
+}
+
+.overflow-guard,
+.rich-content {
+  min-width: 0;
+  max-width: 100%;
+  overflow-x: hidden;
+  overflow-x: clip;
+}
+
+.rich-content > * {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.rich-content pre {
+  direction: ltr;
+  unicode-bidi: plaintext;
+  text-align: left;
+  min-width: 0;
+  max-width: 100%;
+  margin: 1rem 0;
+  overflow-x: hidden;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  border-radius: 1.5rem;
+  background: #0f172a;
+  color: #f8fafc;
+  padding: 1rem;
+  font-size: 0.875rem;
+  line-height: 1.7;
+}
+
+.rich-content pre code,
+.rich-content code {
+  min-width: 0;
+  max-width: 100%;
+  white-space: inherit;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.rich-content table,
+.rich-content iframe,
+.rich-content img,
+.rich-content video {
+  max-width: 100%;
 }
 
 /* כרטיס לבן בסגנון סטיקר: צל רך + הדגשת פנים עדינה למעלה */

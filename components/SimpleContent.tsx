@@ -77,7 +77,7 @@ export default function SimpleContent({ content, className = "" }: SimpleContent
     return (
       <div
         dir="rtl"
-        className={`${richHtmlClasses} ${className}`}
+        className={`rich-content ${richHtmlClasses} ${className}`}
         dangerouslySetInnerHTML={{ __html: injectHeadingIds(sanitizeHtml(content)) }}
       />
     );
@@ -96,7 +96,7 @@ export default function SimpleContent({ content, className = "" }: SimpleContent
   });
 
   return (
-    <div className={`flex flex-col gap-5 leading-relaxed ${className}`}>
+    <div className={`rich-content flex flex-col gap-5 leading-relaxed ${className}`}>
       {blocks.map((block, i) => {
         if (block.startsWith("### ")) {
           return (
